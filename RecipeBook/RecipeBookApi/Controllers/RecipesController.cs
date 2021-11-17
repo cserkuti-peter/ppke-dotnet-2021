@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using RecipeBookApi.Models;
+using RecipeBookApi.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,18 +15,23 @@ namespace RecipeBookApi.Controllers
     [ApiController]
     public class RecipesController : ControllerBase
     {
-        private readonly RecipeBookService _recipeBookService;
+        private readonly IRecipeBookService _recipeBookService;
+        private readonly ILogger<RecipesController> _logger;
 
-        public RecipesController(RecipeBookService recipeBookService)
+        public RecipesController(IRecipeBookService recipeBookService, ILogger<RecipesController> logger)
         {
             _recipeBookService = recipeBookService;
+            _logger = logger;
         }
 
         // GET: api/<RecipesController>
         [HttpGet]
-        public IEnumerable<Recipe> GetAll()
+        public async Task<IEnumerable<Recipe>> GetAll()
         {
-            return _recipeBookService.GetAll();
+            _logger.LogInformation("GetAll called.");
+            //throw new InvalidOperationException("testing...");
+            //throw new HttpResponseException("There was an error") { Status = 500 };
+            return await _recipeBookService.GetAll();
         }
 
         // GET api/<RecipesController>/5
@@ -50,18 +57,18 @@ namespace RecipeBookApi.Controllers
 
         // PUT api/<RecipesController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Recipe r)
+        public async Task<IActionResult> Put(int id, [FromBody] Recipe r)
         {
-            return _recipeBookService.UpdateRecipe(id, r)
+            return await _recipeBookService.UpdateRecipe(id, r)
                 ? NoContent()
                 : NotFound();
         }
 
         // DELETE api/<RecipesController>/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return _recipeBookService.DeleteRecipe(id)
+            return await _recipeBookService.DeleteRecipe(id)
                 ? NoContent()
                 : NotFound();
         }
