@@ -4,11 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RecipeBookApi.Models
+namespace RecipeBookApi.Dtos
 {
-    public class Recipe
+    public class UpdateRecipeDto
     {
-        public int Id { get; set; }
         [Required]
         [MaxLength(250)]
         public string Name { get; set; }
@@ -18,6 +17,5 @@ namespace RecipeBookApi.Models
         public int CookTimeMinutes { get; set; }
         [Range(1, 100)]
         public int Servers { get; set; }
-        public double RatingsAvg { get; set; }
     }
 }

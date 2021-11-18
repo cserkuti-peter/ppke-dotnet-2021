@@ -30,8 +30,11 @@ namespace RecipeBookApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            //services.AddDbContext<RecipeBookContext>(opt =>
+            //    opt.UseInMemoryDatabase("RecipeBook"));
             services.AddDbContext<RecipeBookContext>(opt =>
-                opt.UseInMemoryDatabase("RecipeBook"));
+                opt.UseSqlServer(Configuration.GetConnectionString("RecipeBook")));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RecipeBookApi", Version = "v1" });

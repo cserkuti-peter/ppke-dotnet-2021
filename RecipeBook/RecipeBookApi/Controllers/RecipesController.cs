@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using RecipeBookApi.Dtos;
 using RecipeBookApi.Models;
 using RecipeBookApi.Services;
+using RecipeBookApi.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +28,7 @@ namespace RecipeBookApi.Controllers
 
         // GET: api/<RecipesController>
         [HttpGet]
-        public async Task<IEnumerable<Recipe>> GetAll()
+        public async Task<IEnumerable<RecipeRowVM>> GetAll()
         {
             _logger.LogInformation("GetAll called.");
             //throw new InvalidOperationException("testing...");
@@ -36,9 +38,9 @@ namespace RecipeBookApi.Controllers
 
         // GET api/<RecipesController>/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            var r = _recipeBookService.GetRecipeById(id);
+            var r = await _recipeBookService.GetRecipeById(id);
 
             if (r == null)
                 return NotFound();
@@ -48,16 +50,16 @@ namespace RecipeBookApi.Controllers
 
         // POST api/<RecipesController>
         [HttpPost]
-        public IActionResult Post([FromBody] Recipe r)
+        public async Task<IActionResult> Post([FromBody] NewRecipeDto r)
         {
-            var createdRecipe = _recipeBookService.CreateRecipe(r);
+            var createdRecipe = await _recipeBookService.CreateRecipe(r);
 
             return CreatedAtAction(nameof(Get), new { id = createdRecipe.Id }, createdRecipe);
         }
 
         // PUT api/<RecipesController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Recipe r)
+        public async Task<IActionResult> Put(int id, [FromBody] UpdateRecipeDto r)
         {
             return await _recipeBookService.UpdateRecipe(id, r)
                 ? NoContent()

@@ -1,4 +1,6 @@
-﻿using RecipeBookApi.Models;
+﻿using RecipeBookApi.Dtos;
+using RecipeBookApi.Models;
+using RecipeBookApi.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -8,11 +10,11 @@ namespace RecipeBookApi.Services
 {
     public interface IRecipeBookService
     {
-        Task<Recipe> CreateRecipe(Recipe r);
+        Task<RecipeVM> CreateRecipe(NewRecipeDto r);
         Task<bool> DeleteRecipe(int id);
-        Task<List<Recipe>> GetAll();
-        Task<Recipe> GetRecipeById(int id);
-        Task<List<Recipe>> GetRecipesWhere(Expression<Func<Recipe, bool>> predicate);
-        Task<bool> UpdateRecipe(int id, Recipe r);
+        Task<List<RecipeRowVM>> GetAll();
+        Task<RecipeVM> GetRecipeById(int id);
+        Task<List<RecipeRowVM>> GetRecipesWhere(Expression<Func<Recipe, bool>> predicate);
+        Task<bool> UpdateRecipe(int id, UpdateRecipeDto r);
     }
 }
