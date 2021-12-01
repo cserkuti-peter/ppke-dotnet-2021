@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace RecipeBookApi.Models
 {
+    [Table("Recipe")]
     public class Recipe
     {
         public int Id { get; set; }
@@ -19,5 +21,11 @@ namespace RecipeBookApi.Models
         [Range(1, 100)]
         public int Servers { get; set; }
         public double RatingsAvg { get; set; }
+
+        public int RecipeBookId { get; set; }
+        //[ForeignKey("RecipeBookId")]
+        public RecipeBook RecipeBook { get; set; }
+
+        public ICollection<CategoryRecipe> CategoryRecipes { get; set; }
     }
 }

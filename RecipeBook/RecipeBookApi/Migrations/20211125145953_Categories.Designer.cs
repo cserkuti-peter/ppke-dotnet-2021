@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RecipeBookApi.Models;
 
 namespace RecipeBookApi.Migrations
 {
     [DbContext(typeof(RecipeBookContext))]
-    partial class RecipeBookContextModelSnapshot : ModelSnapshot
+    [Migration("20211125145953_Categories")]
+    partial class Categories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,9 +124,6 @@ namespace RecipeBookApi.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RecipesNumber")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("RecipeBook");
@@ -134,8 +133,7 @@ namespace RecipeBookApi.Migrations
                         {
                             Id = 1,
                             Description = "...",
-                            Name = "My favorite recipes",
-                            RecipesNumber = 2
+                            Name = "My favorite recipes"
                         });
                 });
 

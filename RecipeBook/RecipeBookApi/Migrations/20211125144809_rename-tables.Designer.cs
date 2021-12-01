@@ -2,51 +2,23 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RecipeBookApi.Models;
 
 namespace RecipeBookApi.Migrations
 {
     [DbContext(typeof(RecipeBookContext))]
-    partial class RecipeBookContextModelSnapshot : ModelSnapshot
+    [Migration("20211125144809_rename-tables")]
+    partial class renametables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.12")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("RecipeBookApi.Models.Category", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Category");
-                });
-
-            modelBuilder.Entity("RecipeBookApi.Models.CategoryRecipe", b =>
-                {
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CategoryId", "RecipeId");
-
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("CategoryRecipe");
-                });
 
             modelBuilder.Entity("RecipeBookApi.Models.Recipe", b =>
                 {
@@ -122,9 +94,6 @@ namespace RecipeBookApi.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RecipesNumber")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("RecipeBook");
@@ -134,28 +103,8 @@ namespace RecipeBookApi.Migrations
                         {
                             Id = 1,
                             Description = "...",
-                            Name = "My favorite recipes",
-                            RecipesNumber = 2
+                            Name = "My favorite recipes"
                         });
-                });
-
-            modelBuilder.Entity("RecipeBookApi.Models.CategoryRecipe", b =>
-                {
-                    b.HasOne("RecipeBookApi.Models.Category", "Category")
-                        .WithMany("CategoryRecipes")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RecipeBookApi.Models.Recipe", "Recipe")
-                        .WithMany("CategoryRecipes")
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Recipe");
                 });
 
             modelBuilder.Entity("RecipeBookApi.Models.Recipe", b =>
@@ -167,16 +116,6 @@ namespace RecipeBookApi.Migrations
                         .IsRequired();
 
                     b.Navigation("RecipeBook");
-                });
-
-            modelBuilder.Entity("RecipeBookApi.Models.Category", b =>
-                {
-                    b.Navigation("CategoryRecipes");
-                });
-
-            modelBuilder.Entity("RecipeBookApi.Models.Recipe", b =>
-                {
-                    b.Navigation("CategoryRecipes");
                 });
 
             modelBuilder.Entity("RecipeBookApi.Models.RecipeBook", b =>

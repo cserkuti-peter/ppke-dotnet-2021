@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using RecipeBookApi.Dtos;
+using RecipeBookApi.Filters;
 using RecipeBookApi.Models;
 using RecipeBookApi.ViewModels;
 using System;
@@ -23,62 +24,79 @@ namespace RecipeBookApi.Services
             _mapper = mapper;
         }
 
-        public async Task<RecipeVM> CreateRecipe(NewRecipeDto r)
+        public async Task<RecipeVM> CreateRecipe(int recipeBookId, NewRecipeDto r)
         {
-            //var m = new Recipe
-            //{
-            //    CookTimeMinutes = r.CookTimeMinutes,
-            //    Ingredients = r.Ingredients,
-            //    Method = r.Method,
-            //    Name = r.Name,
-            //    RatingsAvg = 0,
-            //    Servers = r.Servers
-            //};
-            var m = _mapper.Map<Recipe>(r);
-            m.RatingsAvg = 0;
+            var recipe = _mapper.Map<Recipe>(r);
+            recipe.RatingsAvg = 0;
 
-            _context.Recipes.Add(m);
+            var recipeBook = await _context.RecipeBooks.FindAsync(recipeBookId);
+            if (recipeBook == null)
+                return null;
+
+            recipeBook.RecipesNumber++;
+
+            //  1. Set foreign key by id
+            recipe.RecipeBookId = recipeBookId;
+
+            //  2. Set foreign key by navigation property
+            //recipe.RecipeBook = recipeBook;
+
+            _context.Recipes.Add(recipe);
             await _context.SaveChangesAsync();
 
-            //return new RecipeVM
-            //{ 
-            //    Id = m.Id,
-            //    Servers = m.Servers,
-            //    RatingsAvg = m.RatingsAvg,
-            //    Name = m.Name,
-            //    Method = m.Method,
-            //    Ingredients = m.Ingredients,
-            //    CookTimeMinutes = m.CookTimeMinutes
-            //};
-            return _mapper.Map<RecipeVM>(m);
+            return _mapper.Map<RecipeVM>(recipe);
         }
 
         public async Task<bool> DeleteRecipe(int id)
         {
-            var r = await _context.Recipes.FindAsync(id);
-            if (r == null)
+            var recipe = await _context.Recipes.FindAsync(id);
+            if (recipe == null)
                 return false;
 
-            _context.Recipes.Remove(r);
+            //  1. Get the booko by a separate query
+            var recipeBook = await _context.RecipeBooks.FindAsync(recipe.RecipeBookId);
+
+            //  2. Explicit loading
+            //await _context
+            //    .Entry(recipe)
+            //    .Reference(x => x.RecipeBook)
+            //    .LoadAsync();
+
+            //  3. Lazy loading (Microsoft.EntityFrameworkCore.Proxies package)
+            //recipe.RecipeBook
+
+            recipeBook.RecipesNumber--;
+
+            _context.Recipes.Remove(recipe);
 
             await _context.SaveChangesAsync();
 
             return true;
         }
 
-        public async Task<List<RecipeRowVM>> GetAll()
+        public async Task<List<RecipeRowVM>> GetAll(GenericQueryOption<RecipeFilter> option)
         {
-            return await _context.Recipes
-                //  1. Manual
-                //.Select(x => new RecipeRowVM
-                //{ 
-                //    Id = x.Id,
-                //    Name = x.Name,
-                //    RatingsAvg = x.RatingsAvg
-                //})
-                //  2. Automapper: in memory
-                //.Select(x => _mapper.Map<RecipeRowVM>(x))
-                //  3. Automapper: building the expression tree
+            var q = _context.Recipes as IQueryable<Recipe>;
+            if (!String.IsNullOrEmpty(option.Filter?.NameTerm))
+            {
+                q = q.Where(x => x.Name.Contains(option.Filter.NameTerm));
+            }
+            if (option.Filter?.MinRating != null)
+            {
+                q = q.Where(x => x.RatingsAvg >= option.Filter.MinRating);
+            }
+            if (option.Filter?.MaxRating != null)
+            {
+                q = q.Where(x => x.RatingsAvg <= option.Filter.MaxRating);
+            }
+
+            q = option.SortOrder == SortOrder.Ascending
+                ? q.OrderBy(x => x.Name)
+                : q.OrderByDescending(x => x.Name);
+
+            return await q
+                .Skip((option.Page - 1) * option.PageSize)
+                .Take(option.PageSize)
                 .ProjectTo<RecipeRowVM>(_mapper.ConfigurationProvider)
                 .ToListAsync();
         }

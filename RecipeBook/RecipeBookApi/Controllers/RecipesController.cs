@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using RecipeBookApi.Dtos;
+using RecipeBookApi.Filters;
 using RecipeBookApi.Models;
 using RecipeBookApi.Services;
 using RecipeBookApi.ViewModels;
@@ -28,12 +29,12 @@ namespace RecipeBookApi.Controllers
 
         // GET: api/<RecipesController>
         [HttpGet]
-        public async Task<IEnumerable<RecipeRowVM>> GetAll()
+        public async Task<IEnumerable<RecipeRowVM>> GetAll([FromQuery]GenericQueryOption<RecipeFilter> option)
         {
             _logger.LogInformation("GetAll called.");
             //throw new InvalidOperationException("testing...");
             //throw new HttpResponseException("There was an error") { Status = 500 };
-            return await _recipeBookService.GetAll();
+            return await _recipeBookService.GetAll(option);
         }
 
         // GET api/<RecipesController>/5
@@ -48,11 +49,13 @@ namespace RecipeBookApi.Controllers
             return Ok(r);
         }
 
-        // POST api/<RecipesController>
+        // POST api/recipebooks/{recipeBookId}/recipes/
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] NewRecipeDto r)
+        public async Task<IActionResult> Post(int recipeBookId, [FromBody] NewRecipeDto r)
         {
-            var createdRecipe = await _recipeBookService.CreateRecipe(r);
+            var createdRecipe = await _recipeBookService.CreateRecipe(recipeBookId, r);
+            if (createdRecipe == null)
+                return NotFound();
 
             return CreatedAtAction(nameof(Get), new { id = createdRecipe.Id }, createdRecipe);
         }
