@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using RecipeBookApi.Dtos;
 using RecipeBookApi.Filters;
@@ -71,6 +72,8 @@ namespace RecipeBookApi.Controllers
 
         // DELETE api/<RecipesController>/5
         [HttpDelete("{id}")]
+        //[Authorize(Roles = UserRoles.User)]
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             return await _recipeBookService.DeleteRecipe(id)

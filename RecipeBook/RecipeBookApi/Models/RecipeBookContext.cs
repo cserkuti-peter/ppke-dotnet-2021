@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using RecipeBookApi.Models.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RecipeBookApi.Models
 {
-    public class RecipeBookContext : DbContext
+    public class RecipeBookContext : IdentityDbContext<ApplicationUser>
     {
         public RecipeBookContext(DbContextOptions<RecipeBookContext> options) : base(options)
         {
@@ -14,6 +16,8 @@ namespace RecipeBookApi.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);     //  Important for IdentityDbContext
+
             //  Fluent API
             modelBuilder.Entity<Recipe>()
                 .HasOne(r => r.RecipeBook)
