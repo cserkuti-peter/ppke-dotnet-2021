@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  recipebookapi:
+    image: ${DOCKER_REGISTRY-}recipebookapi
+    build:
+      context: .
+      dockerfile: RecipeBookApi/Dockerfile
+  db:
+    image: "mcr.microsoft.com/mssql/server:2017-latest"
